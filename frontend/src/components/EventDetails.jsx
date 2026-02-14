@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../utils/api'
 import { useAuth } from '../context/AuthContext'
+import Popup from './Popup'
 
 const EventDetails = () => {
   const { id } = useParams()
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [popup, setPopup] = useState({ show: false, message: '', type: 'info' })
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -36,9 +38,9 @@ const EventDetails = () => {
         ...event,
         availableSeats: event.availableSeats - 1
       })
-      alert('Successfully registered!')
+      setPopup({ show: true, message: 'Successfully registered!', type: 'success' })
     } catch (err) {
-      alert(err.response?.data?.message || 'Registration failed')
+      setPopup({ show: true, message: err.response?.data?.message || 'Registration failed', type: 'error' })
     }
   }
 
@@ -49,9 +51,9 @@ const EventDetails = () => {
         ...event,
         availableSeats: event.availableSeats + 1
       })
-      alert('Registration cancelled')
+      setPopup({ show: true, message: 'Registration cancelled', type: 'info' })
     } catch (err) {
-      alert(err.response?.data?.message || 'Cancel failed')
+      setPopup({ show: true, message: err.response?.data?.message || 'Cancel failed', type: 'error' })
     }
   }
 
@@ -183,6 +185,14 @@ const EventDetails = () => {
             </button> to register for this event
           </p>
         </div>
+      )}
+      
+      {popup.show && (
+        <Popup 
+          message={popup.message} 
+          type={popup.type} 
+          onClose={() => setPopup({ ...popup, show: false })}
+        />
       )}
     </div>
   )

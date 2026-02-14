@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../utils/api'
+import Popup from './Popup'
 
 const Dashboard = () => {
   const [registered, setRegistered] = useState([])
@@ -7,6 +8,7 @@ const Dashboard = () => {
   const [past, setPast] = useState([])
   const [loading, setLoading] = useState(true)
   const [registeringEventId, setRegisteringEventId] = useState(null)
+  const [popup, setPopup] = useState({ show: false, message: '', type: 'info' })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +46,7 @@ const Dashboard = () => {
       setUpcoming(upRes.data);
     } catch (err) {
       console.error('Registration failed', err);
-      alert('Registration failed: ' + (err.response?.data?.message || err.message));
+      setPopup({ show: true, message: 'Registration failed: ' + (err.response?.data?.message || err.message), type: 'error' });
     } finally {
       setRegisteringEventId(null);
     }
@@ -271,6 +273,14 @@ const Dashboard = () => {
           </div>
         )}
       </section>
+      
+      {popup.show && (
+        <Popup 
+          message={popup.message} 
+          type={popup.type} 
+          onClose={() => setPopup({ ...popup, show: false })}
+        />
+      )}
     </div>
   )
 }
